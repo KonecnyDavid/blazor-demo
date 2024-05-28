@@ -1,0 +1,52 @@
+﻿@page "/blog/{Id:int}"
+@using DAL
+@using Microsoft.EntityFrameworkCore
+@inject BloggingContext Db
+@attribute [StreamRendering]
+
+<PageTitle>Blog datail</PageTitle>
+
+@if (_blog == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <h1>Blog @_blog.Url</h1>
+
+    <h3>Posts</h3>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Title</th>
+            <th>Content</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var post in _blog.Posts)
+        {
+            <tr>
+                <td>@post.PostId</td>
+                <td>@post.Title</td>
+                <td>@post.Content</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Blog? _blog;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+        _blog = await Db.Blogs.Include(b => b.Posts).Where(b => b.BlogId == Id).SingleAsync();
+    }
+}

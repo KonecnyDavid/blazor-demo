@@ -1,0 +1,57 @@
+﻿@page "/"
+@using DAL
+@using Microsoft.EntityFrameworkCore
+@inject BloggingContext Db
+@attribute [StreamRendering]
+
+<PageTitle>Blogs</PageTitle>
+
+<h1>Blogs</h1>
+
+<p>This component demonstrates showing data.</p>
+
+@if (_blogs == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Url</th>
+            <th>Post Count</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var blog in _blogs)
+        {
+            <tr>
+                <td>@blog.BlogId</td>
+                <td>@blog.Url</td>
+                <td>@blog.Posts.Count</td>
+                <td>
+                    <a href="/blog/@blog.BlogId">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Blog>? _blogs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+        _blogs = await Db.Blogs.Include(b => b.Posts).ToListAsync();
+    }
+}
